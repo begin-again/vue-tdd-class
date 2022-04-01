@@ -1,5 +1,7 @@
 <template>
-    <sign-up-page></sign-up-page>
+    <div class="container">
+        <sign-up-page></sign-up-page>
+    </div>
 </template>
 
 <script>
@@ -12,3 +14,7 @@ export default {
     },
 };
 </script>
+
+
+<style>
+</style>
