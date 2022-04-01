@@ -9,15 +9,12 @@
                 <h1 class="text-center">Sign Up</h1>
             </div>
             <div class="card-body">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input
-                        id="username"
-                        v-model="username"
-                        class="form-control"
-                    />
-                    <span>{{ errors.username }}</span>
-                </div>
+                <input-value
+                    id="username"
+                    label="Username"
+                    :help="errors.username"
+                    v-model="username"
+                />
                 <div class="mb-3">
                     <label for="email" class="form-label">E-mail</label>
                     <input id="email" v-model="email" class="form-control" />
@@ -68,8 +65,13 @@
 
 <script>
 import axios from "axios";
+import InputValue from "../components/input.vue";
+
 export default {
     name: "SignUpPage",
+    components: {
+        InputValue,
+    },
     data() {
         return {
             username: "",
@@ -103,6 +105,9 @@ export default {
                 .finally(() => {
                     this.apiProgress = false;
                 });
+        },
+        onChangeUsername(value) {
+            this.username = value;
         },
     },
     computed: {
