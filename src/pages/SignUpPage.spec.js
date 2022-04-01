@@ -135,21 +135,21 @@ describe('interactions',  () => {
 
         await setup();
         const button = screen.getByRole('button', {name: 'Sign Up'});
-
         await userEvent.click(button);
+        
         const spinner = screen.getByRole("status");
         await server.close();
 
         expect(spinner).toBeInTheDocument();
 
     });
-    it('does not display spinners when api call is not in progress', async () => {
+    // it('does not display spinners when api call is not in progress', async () => {
 
-        await setup();
-        const spinner = screen.queryByRole("status");
+    //     await setup();
+    //     const spinner = screen.queryByRole("status");
 
-        expect(spinner).not.toBeInTheDocument();
-    });
+    //     expect(spinner).not.toBeInTheDocument();
+    // });
     // it('does not display account activation info before button clicked', async () => {
     //     await setup();
     //     screen.getByTestId('alert-sign-up-success');
