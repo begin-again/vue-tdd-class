@@ -3,7 +3,7 @@
         <form
             v-if="!signUpSuccess"
             class="card mt-5"
-            data-testid="form-sign-up"
+            data-test-id="form-sign-up"
         >
             <div class="card-header">
                 <h1 class="text-center">Sign Up</h1>
