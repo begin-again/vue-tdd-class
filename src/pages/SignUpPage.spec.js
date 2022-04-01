@@ -63,6 +63,7 @@ describe('interactions',  () => {
     const username = "testUser";
     const email = "test@email";
     let counter = 0;
+    /** @type {HTMLElement} */
     let button;
     let requestBody;
 
@@ -178,5 +179,63 @@ describe('interactions',  () => {
         await waitFor(() => {
             expect(form).not.toBeInTheDocument();
         });
+    });
+    it('displays validation message for username', async () => {
+        const validationErrors = {
+            username: "Username cannot be empty"
+        };
+        server.use(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(
+                    ctx.status(400),
+                    ctx.json({validationErrors})
+                );
+            })
+        );
+
+        await setup();
+        await userEvent.click(button);
+        const text = await screen.findByText(validationErrors.username);
+
+        expect(text).toBeInTheDocument();
+    });
+    it('hides spinner after error response received', async () => {
+        const validationErrors = {
+            username: "Username cannot be empty"
+        };
+        server.use(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(
+                    ctx.status(400),
+                    ctx.json({validationErrors})
+                );
+            })
+        );
+
+        await setup();
+        await userEvent.click(button);
+        await screen.findByText(validationErrors.username);
+        const spinner = screen.queryByRole("status");
+
+        expect(spinner).not.toBeInTheDocument();
+    });
+    it('enables the button after error response received', async () => {
+        const validationErrors = {
+            username: "Username cannot be empty"
+        };
+        server.use(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(
+                    ctx.status(400),
+                    ctx.json({validationErrors})
+                );
+            })
+        );
+
+        await setup();
+        await userEvent.click(button);
+        await screen.findByText(validationErrors.username);
+
+        expect(button).toBeEnabled();
     });
 });
