@@ -63,8 +63,9 @@ describe('interactions',  () => {
     const username = "testUser";
     const email = "test@email";
     let counter = 0;
-
+    let button;
     let requestBody;
+
     const server = setupServer(
         rest.post('/api/1.0/users', (req, res, ctx) => {
             counter += 1;
@@ -88,7 +89,7 @@ describe('interactions',  () => {
         const emailInput = screen.getByLabelText('E-mail');
         const pass1 = screen.getByLabelText('Password');
         const pass2 = screen.getByLabelText('Password Repeat');
-
+        button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.type(userInput, username);
         await userEvent.type(emailInput, email);
         await userEvent.type(pass1, password);
@@ -97,14 +98,11 @@ describe('interactions',  () => {
     it('enables the button when both password inputs match', async () => {
         await setup();
 
-        const button = screen.getByRole('button', {name: 'Sign Up'});
-
         expect(button).toBeEnabled();
     });
     it('sends username, email, and password to backend after clicking the button', async () => {
         await setup();
 
-        const button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.click(button);
         await screen.findByText(
             "Please check your e-mail to activate your account"
@@ -119,7 +117,6 @@ describe('interactions',  () => {
     it('does not allow clicking to the button when this is an ongoing api call', async () => {
         await setup();
 
-        const button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.click(button);
         await userEvent.click(button);
 
@@ -128,7 +125,6 @@ describe('interactions',  () => {
     it('displays spinners while api request is in progress', async () => {
         await setup();
 
-        const button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.click(button);
 
         const spinner = screen.getByRole("status");
@@ -144,7 +140,6 @@ describe('interactions',  () => {
     it('displays account activation info after successful sign-up request', async () => {
         await setup();
 
-        const button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.click(button);
 
         const text = await screen.findByText(
@@ -168,7 +163,6 @@ describe('interactions',  () => {
         );
 
         await setup();
-        const button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.click(button);
 
         const text = screen.queryByText("Please check your e-mail to activate your account");
@@ -178,7 +172,6 @@ describe('interactions',  () => {
     it('hides sign-up form after successful sign-up request', async () => {
         await setup();
 
-        const button = screen.getByRole('button', {name: 'Sign Up'});
         await userEvent.click(button);
         const form = screen.queryByTestId('form-sign-up');
 
