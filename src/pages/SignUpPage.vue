@@ -91,9 +91,9 @@ export default {
                 .post("/api/1.0/users", requestBody)
                 .then(() => {
                     this.signUpSuccess = true;
-                    this.apiProgress = false;
                 })
-                .catch(() => {
+                .catch(() => 1)
+                .finally(() => {
                     this.apiProgress = false;
                 });
         },
