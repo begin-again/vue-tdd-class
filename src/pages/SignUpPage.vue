@@ -1,6 +1,10 @@
 <template>
     <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-        <form v-if="!signUpSuccess" class="card mt-5" data-testid="form-sign-up">
+        <form
+            v-if="!signUpSuccess"
+            class="card mt-5"
+            data-testid="form-sign-up"
+        >
             <div class="card-header">
                 <h1 class="text-center">Sign Up</h1>
             </div>
@@ -41,11 +45,11 @@
                 <div class="text-center">
                     <button
                         class="btn btn-primary"
-                        :disabled="isDisabled || apiCalled"
+                        :disabled="isDisabled || apiProgress"
                         @click.prevent="submit"
                     >
                         <span
-                            v-if="apiCalled"
+                            v-if="apiProgress"
                             class="spinner-border spinner-border-sm"
                             role="status"
                         ></span>
@@ -54,7 +58,7 @@
                 </div>
             </div>
         </form>
-        <div v-if="signUpSuccess" class="alert alert-success mt-3" role="alert">
+        <div v-else class="alert alert-success mt-3" role="alert">
             Please check your e-mail to activate your account
         </div>
     </div>
@@ -71,7 +75,7 @@ export default {
             email: "",
             password: "",
             passwordRepeat: "",
-            apiCalled: false,
+            apiProgress: false,
             signUpSuccess: false,
         };
     },
@@ -82,8 +86,16 @@ export default {
                 password: this.password,
                 email: this.email,
             };
-            this.apiCalled = true;
-            axios.post("/api/1.0/users", requestBody);
+            this.apiProgress = true;
+            axios
+                .post("/api/1.0/users", requestBody)
+                .then(() => {
+                    this.signUpSuccess = true;
+                    this.apiProgress = false;
+                })
+                .catch(() => {
+                    this.apiProgress = false;
+                });
         },
     },
     computed: {

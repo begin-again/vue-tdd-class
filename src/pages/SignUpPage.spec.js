@@ -2,7 +2,7 @@
 * @jest-environment jsdom
 */
 import SignUpPage from './SignUpPage';
-import {render, screen} from '@testing-library/vue';
+import {render, screen, waitFor} from '@testing-library/vue';
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { setupServer } from 'msw/node';
@@ -149,73 +149,66 @@ describe('interactions',  () => {
 
         expect(spinner).not.toBeInTheDocument();
     });
-    // it('does not display account activation info before button clicked', async () => {
-    //     await setup();
-    //     screen.getByTestId('alert-sign-up-success');
-    //     const text = screen.getByTestId('alert-sign-up-success');
+    it('displays account activation info after successful sign-up request', async () => {
+        const server = setupServer(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(ctx.status(200));
+            })
+        );
+        server.listen();
 
-    //     expect(text).not.toBeInDocument();
-    // });
-    // it('displays account activation info after successful sign-up request', async () => {
-    //     const server = setupServer(
-    //         rest.post('/api/1.0/users', (req, res, ctx) => {
-    //             return res(ctx.status(200));
-    //         })
-    //     );
-    //     server.listen();
+        await setup();
+        const button = screen.getByRole('button', {name: 'Sign Up'});
+        await userEvent.click(button);
+        await server.close();
 
-    //     await setup();
-    //     const button = screen.getByRole('button', {name: 'Sign Up'});
-    //     await userEvent.click(button);
-    //     await server.close();
+        const text = await screen.findByText(
+            "Please check your e-mail to activate your account"
+        );
 
-    //     const text = screen.queryByTestId('alert-success');
-    //     console.log(text);
+        expect(text).toBeInTheDocument();
+    });
+    it('does not display account activation success before sign up request', async () => {
+        await setup();
 
-    //     expect(text).toBeInDocument();
-    // });
-    // it('does not display account activation success before sign up request', async () => {
-    //     await setup();
+        const text = screen.queryByText("Please check your e-mail to activate your account");
 
-    //     const text = screen.queryByText("Please check your e-mail to activate your account");
+        expect(text).not.toBeInTheDocument();
+    });
+    it('does not displays account activation info after failed sign-up request', async () => {
+        const server = setupServer(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(ctx.status(400));
+            })
+        );
+        server.listen();
 
-    //     expect(text).not.toBeInDocument();
-    // });
-    // it('does not displays account activation info after failed sign-up request', async () => {
-    //     const server = setupServer(
-    //         rest.post('/api/1.0/users', (req, res, ctx) => {
-    //             return res(ctx.status(400));
-    //         })
-
-    //     );
-    //     server.listen();
-
-    //     await setup();
-    //     const button = screen.getByRole('button', {name: 'Sign Up'});
-    //     await userEvent.click(button);
-    //     await server.close();
+        await setup();
+        const button = screen.getByRole('button', {name: 'Sign Up'});
+        await userEvent.click(button);
+        await server.close();
 
 
-    //     const text = screen.queryByText("Please check your e-mail to activate your account");
+        const text = screen.queryByText("Please check your e-mail to activate your account");
 
-    //     expect(text).not.toBeInDocument();
-    // });
-    // it('hides sign-up form after successful sign-up request', async () => {
-    //     const server = setupServer(
-    //         rest.post('/api/1.0/users', (req, res, ctx) => {
-    //             return res(ctx.status(200));
-    //         })
-    //     );
-    //     server.listen();
+        expect(text).not.toBeInTheDocument();
+    });
+    it('hides sign-up form after successful sign-up request', async () => {
+        const server = setupServer(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(ctx.status(200));
+            })
+        );
+        server.listen();
 
-    //     await setup();
-    //     const button = screen.getByRole('button', {name: 'Sign Up'});
-    //     const form = screen.queryByTestId('form-sign-up');
-    //     await userEvent.click(button);
-    //     await server.close();
+        await setup();
+        const button = screen.getByRole('button', {name: 'Sign Up'});
+        const form = screen.queryByTestId('form-sign-up');
+        await userEvent.click(button);
+        await server.close();
 
-    //     await waitFor(() => {
-    //         expect(form).not.toBeInDocument();
-    //     });
-    // });
+        await waitFor(() => {
+            expect(form).not.toBeInTheDocument();
+        });
+    });
 });
