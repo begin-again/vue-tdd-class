@@ -124,25 +124,25 @@ describe('interactions',  () => {
 
         expect(counter).toBe(1);
     });
-    // it('displays spinners while api request is in progress', async () => {
-    //     const server = setupServer(
-    //         rest.post('/api/1.0/users', (req, res, ctx) => {
-    //             return res(ctx.status(200));
-    //         })
+    it('displays spinners while api request is in progress', async () => {
+        const server = setupServer(
+            rest.post('/api/1.0/users', (req, res, ctx) => {
+                return res(ctx.status(200));
+            })
 
-    //     );
-    //     server.listen();
+        );
+        server.listen();
 
-    //     await setup();
-    //     const button = screen.getByRole('button', {name: 'Sign Up'});
+        await setup();
+        const button = screen.getByRole('button', {name: 'Sign Up'});
 
-    //     await userEvent.click(button);
-    //     const spinner = screen.getByRole("status");
-    //     await server.close();
+        await userEvent.click(button);
+        const spinner = screen.getByRole("status");
+        await server.close();
 
-    //     expect(spinner).toBeInTheDocument();
+        expect(spinner).toBeInTheDocument();
 
-    // });
+    });
     // it('does not display spinners when api call is not in progress', async () => {
 
     //     await setup();
