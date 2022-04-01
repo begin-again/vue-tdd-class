@@ -143,13 +143,13 @@ describe('interactions',  () => {
         expect(spinner).toBeInTheDocument();
 
     });
-    // it('does not display spinners when api call is not in progress', async () => {
+    it('does not display spinners when api call is not in progress', async () => {
 
-    //     await setup();
-    //     const spinner = screen.queryByRole("status");
+        await setup();
+        const spinner = screen.queryByRole("status");
 
-    //     expect(spinner).not.toBeInTheDocument();
-    // });
+        expect(spinner).not.toBeInTheDocument();
+    });
     // it('does not display account activation info before button clicked', async () => {
     //     await setup();
     //     screen.getByTestId('alert-sign-up-success');
