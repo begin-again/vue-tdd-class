@@ -144,7 +144,6 @@ describe('interactions',  () => {
 
     });
     it('does not display spinners when api call is not in progress', async () => {
-
         await setup();
         const spinner = screen.queryByRole("status");
 
