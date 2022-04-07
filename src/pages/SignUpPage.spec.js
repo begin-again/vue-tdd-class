@@ -7,26 +7,34 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { setupServer } from 'msw/node';
 import { rest } from 'msw';
+import i18n from '../locales/i18n';
 // import 'whatwg-fetch'; use for when using browser's fetch api
 
 
 describe('layout', () => {
-    it('has sign up header', () => {
-        render(SignUpPage);
+    const setup = () => {
+        render(SignUpPage, {
+            global: {
+                plugins: [i18n]
+            }
+        });
+    };
 
+    it('has sign up header', () => {
+        setup();
         const header = screen.queryByRole('heading', {name: 'Sign Up'});
 
         expect(header).toBeInTheDocument();
     });
     it('has username input', () => {
-        render(SignUpPage);
+        setup();
 
         const input = screen.getByLabelText('Username');
 
         expect(input).toBeInTheDocument();
     });
     it('has email input', () => {
-        render(SignUpPage);
+        setup();
 
         const input = screen.getByLabelText('E-mail');
 
@@ -34,7 +42,7 @@ describe('layout', () => {
         expect(input.type).toBe('text');
     });
     it('has password input', () => {
-        render(SignUpPage);
+        setup();
 
         const input = screen.getByLabelText('Password');
 
@@ -42,7 +50,7 @@ describe('layout', () => {
         expect(input.type).toBe('password');
     });
     it('has password repeat input', () => {
-        render(SignUpPage);
+        setup();
 
         const input = screen.getByLabelText('Password Repeat');
 
@@ -50,7 +58,7 @@ describe('layout', () => {
         expect(input.type).toBe('password');
     });
     it('has a signup button', () => {
-        render(SignUpPage);
+        setup();
 
         const button = screen.queryByRole('button', {name: 'Sign Up'});
 
@@ -101,7 +109,9 @@ describe('interactions',  () => {
         const config = {...defaults, ...options};
         const { name, email, pass1, pass2 } = config;
 
-        render(SignUpPage);
+        render(SignUpPage,  { global: {
+            plugins: [i18n]
+        }});
         const userInput = screen.getByLabelText('Username');
         const emailInput = screen.getByLabelText('E-mail');
         const passwordInput = screen.getByLabelText('Password');

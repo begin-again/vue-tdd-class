@@ -6,37 +6,35 @@
             data-test-id="form-sign-up"
         >
             <div class="card-header">
-                <h1 class="text-center">Sign Up</h1>
+                <h1 class="text-center">{{$t('signUp')}}</h1>
             </div>
             <div class="card-body">
                 <input-value
                     id="username"
-                    label="Username"
+                    :label="$t('username')"
                     type="text"
                     :help="errors.username"
                     v-model="username"
                 ></input-value>
                 <input-value
                     id="email"
-                    label="E-mail"
+                    :label="$t('email')"
                     type="text"
                     :help="errors.email"
                     v-model="email"
                 ></input-value>
                 <input-value
                     id="password"
-                    label="Password"
+                    :label="$t('password')"
                     type="password"
                     :help="errors.password"
                     v-model="password"
-                    class="form-control"
                 ></input-value>
                 <input-value
                     id="passwordRepeat"
-                    label="Password Repeat"
+                    :label="$t('passwordRepeat')"
                     type="password"
                     v-model="passwordRepeat"
-                    class="form-control"
                     :help="hasPasswordMismatch ? 'Passwords mismatch' : ''"
                 ></input-value>
 
