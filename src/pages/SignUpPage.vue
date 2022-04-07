@@ -29,14 +29,12 @@
                     type="password"
                     :help="errors.password"
                     v-model="password"
-                    class="form-control"
                 ></input-value>
                 <input-value
                     id="passwordRepeat"
                     label="Password Repeat"
                     type="password"
                     v-model="passwordRepeat"
-                    class="form-control"
                     :help="hasPasswordMismatch ? 'Passwords mismatch' : ''"
                 ></input-value>
 
