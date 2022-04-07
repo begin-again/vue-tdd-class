@@ -12,33 +12,33 @@
                 <input-value
                     id="username"
                     label="Username"
+                    type="text"
                     :help="errors.username"
                     v-model="username"
-                />
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-mail</label>
-                    <input id="email" v-model="email" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        v-model="password"
-                        class="form-control"
-                    />
-                </div>
-                <div class="mb-3">
-                    <label for="password-repeat" class="form-label"
-                        >Password Repeat</label
-                    >
-                    <input
-                        id="password-repeat"
-                        type="password"
-                        v-model="passwordRepeat"
-                        class="form-control"
-                    />
-                </div>
+                ></input-value>
+                <input-value
+                    id="email"
+                    label="E-mail"
+                    type="text"
+                    :help="errors.email"
+                    v-model="email"
+                ></input-value>
+                <input-value
+                    id="password"
+                    label="Password"
+                    type="password"
+                    :help="errors.password"
+                    v-model="password"
+                    class="form-control"
+                ></input-value>
+                <input-value
+                    id="passwordRepeat"
+                    label="Password Repeat"
+                    type="password"
+                    v-model="passwordRepeat"
+                    class="form-control"
+                    :help="hasPasswordMismatch ? 'Passwords mismatch' : ''"
+                ></input-value>
 
                 <div class="text-center">
                     <button
@@ -106,9 +106,6 @@ export default {
                     this.apiProgress = false;
                 });
         },
-        onChangeUsername(value) {
-            this.username = value;
-        },
     },
     computed: {
         isDisabled() {
@@ -116,6 +113,21 @@ export default {
                 ? this.password !== this.passwordRepeat
                 : true;
         },
+        hasPasswordMismatch() {
+            return this.password !== this.passwordRepeat;
+        },
+    },
+    watch: {
+        username(newValue) {
+            if(`${newValue}`.trim().length) delete this.errors.username;
+        },
+        email(newValue) {
+            if(`${newValue}`.trim().length) delete this.errors.email;
+        },
+        password(newValue) {
+            if(`${newValue}`.trim().length) delete this.errors.password;
+        },
+
     },
 };
 </script>

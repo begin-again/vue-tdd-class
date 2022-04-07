@@ -1,8 +1,6 @@
 import inputValue from './input.vue';
-import {render, screen, waitFor} from '@testing-library/vue';
+import {render} from '@testing-library/vue';
 import "@testing-library/jest-dom";
-import userEvent from "@testing-library/user-event";
-
 
 it('has is-invalid class for input when help is set', () => {
     const {container} = render(inputValue, { props: {help: "error message"}});

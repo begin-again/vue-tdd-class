@@ -59,9 +59,6 @@ describe('layout', () => {
     });
 });
 describe('interactions',  () => {
-    const password = 'p4ssword';
-    const username = "testUser";
-    const email = "test@email";
     let counter = 0;
     /** @type {HTMLElement} */
     let button;
@@ -84,18 +81,56 @@ describe('interactions',  () => {
 
     afterAll(() => server.close());
 
-    const setup = async () => {
+    const defaults = {
+        name: "testUser",
+        email: "mail@example.com",
+        pass1: "P4ssword",
+        pass2: "P4ssword",
+    };
+
+    /**
+     *
+     * @param {Object} [options]
+     * @param {string} options.pass1 - default is P4ssword
+     * @param {string} options.pass2
+     * @param {string} options.name
+     * @param {string} options.email
+     * @returns {Promise<{userInput:HTMLInputElement, emailInput:HTMLInputElement, passwordInput: HTMLInputElement, passwordInputRepeat: HTMLInputElement}>}
+     */
+    const setup = async (options = {}) => {
+        const config = {...defaults, ...options};
+        const { name, email, pass1, pass2 } = config;
+
         render(SignUpPage);
         const userInput = screen.getByLabelText('Username');
         const emailInput = screen.getByLabelText('E-mail');
-        const pass1 = screen.getByLabelText('Password');
-        const pass2 = screen.getByLabelText('Password Repeat');
+        const passwordInput = screen.getByLabelText('Password');
+        const passwordInputRepeat = screen.getByLabelText('Password Repeat');
         button = screen.getByRole('button', {name: 'Sign Up'});
-        await userEvent.type(userInput, username);
         await userEvent.type(emailInput, email);
-        await userEvent.type(pass1, password);
-        await userEvent.type(pass2, password);
+        await userEvent.type(passwordInput, pass1);
+        await userEvent.type(passwordInputRepeat, pass2);
+        await userEvent.type(userInput, name);
+        return {userInput, emailInput, passwordInput, passwordInputRepeat, btn: button};
     };
+
+    /**
+     *
+     * @param {string} field
+     * @param {string} message
+     * @returns {Promise<object>} http request handler
+     */
+    const generateValidationError = (field, message) => {
+        return rest.post('/api/1.0/users', (_req, res, ctx) => {
+            return res(
+                ctx.status(400),
+                ctx.json({validationErrors:{
+                    [field]: message
+                }})
+            );
+        });
+    };
+
     it('enables the button when both password inputs match', async () => {
         await setup();
 
@@ -110,9 +145,9 @@ describe('interactions',  () => {
         );
 
         expect(requestBody).toEqual({
-            username,
-            email,
-            password
+            username: defaults.name,
+            email: defaults.email,
+            password: defaults.pass1
         });
     });
     it('does not allow clicking to the button when this is an ongoing api call', async () => {
@@ -158,7 +193,7 @@ describe('interactions',  () => {
     });
     it('does not displays account activation info after failed sign-up request', async () => {
         server.use(
-            rest.post('/api/1.0/users', (req, res, ctx) => {
+            rest.post('/api/1.0/users', (_req, res, ctx) => {
                 return res(ctx.status(400));
             })
         );
@@ -180,36 +215,12 @@ describe('interactions',  () => {
             expect(form).not.toBeInTheDocument();
         });
     });
-    it('displays validation message for username', async () => {
-        const validationErrors = {
-            username: "Username cannot be empty"
-        };
-        server.use(
-            rest.post('/api/1.0/users', (req, res, ctx) => {
-                return res(
-                    ctx.status(400),
-                    ctx.json({validationErrors})
-                );
-            })
-        );
-
-        await setup();
-        await userEvent.click(button);
-        const text = await screen.findByText(validationErrors.username);
-
-        expect(text).toBeInTheDocument();
-    });
     it('hides spinner after error response received', async () => {
         const validationErrors = {
             username: "Username cannot be empty"
         };
         server.use(
-            rest.post('/api/1.0/users', (req, res, ctx) => {
-                return res(
-                    ctx.status(400),
-                    ctx.json({validationErrors})
-                );
-            })
+            generateValidationError('username', validationErrors.username)
         );
 
         await setup();
@@ -219,17 +230,13 @@ describe('interactions',  () => {
 
         expect(spinner).not.toBeInTheDocument();
     });
+
     it('enables the button after error response received', async () => {
         const validationErrors = {
             username: "Username cannot be empty"
         };
         server.use(
-            rest.post('/api/1.0/users', (req, res, ctx) => {
-                return res(
-                    ctx.status(400),
-                    ctx.json({validationErrors})
-                );
-            })
+            generateValidationError('username', validationErrors.username)
         );
 
         await setup();
@@ -237,5 +244,47 @@ describe('interactions',  () => {
         await screen.findByText(validationErrors.username);
 
         expect(button).toBeEnabled();
+    });
+    it.each`
+        field | message
+        ${'username'} | ${'Username cannot be empty'}
+        ${'email'} | ${'E-mail cannot be empty'}
+        ${'password'} | ${'Password cannot be empty'}
+    `('displays "$message" for "$field"', async ({field, message}) => {
+        server.use(
+            generateValidationError(field, message)
+        );
+
+        await setup();
+        await userEvent.click(button);
+        const text = await screen.findByText(message);
+
+        expect(text).toBeInTheDocument();
+    });
+    it("displays mismatch messages for password", async () => {
+        await setup({pass1: "mismatch"});
+
+        const text = await screen.findByText("Passwords mismatch");
+
+        expect(text).toBeInTheDocument();
+    });
+    it.each`
+        field | message | label
+        ${'username'} | ${'Username cannot be empty'} | ${'Username'}
+        ${'email'} | ${'E-mail cannot be empty'} | ${'E-mail'}
+        ${'password'} | ${'Password cannot be empty'} | ${'Password'}
+    `('clears validation error after field $field is updated', async ({field, message, label}) => {
+        server.use(
+            generateValidationError(field, message)
+        );
+
+        await setup();
+        await userEvent.click(button);
+
+        const text = await screen.findByText(message);
+        const input = screen.queryByLabelText(label);
+        await userEvent.type(input, "updated");
+
+        expect(text).not.toBeInTheDocument();
     });
 });
