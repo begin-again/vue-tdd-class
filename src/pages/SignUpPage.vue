@@ -1,10 +1,6 @@
 <template>
     <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
-        <form
-            v-if="!signUpSuccess"
-            class="card mt-5"
-            data-test-id="form-sign-up"
-        >
+        <form v-if="!signupSuccess" class="card mt-5" data-test-id="form-sign-up">
             <div class="card-header">
                 <h1 class="text-center">{{ $t("signUp") }}</h1>
             </div>
@@ -35,13 +31,8 @@
                     :label="$t('passwordRepeat')"
                     type="password"
                     v-model="passwordRepeat"
-                    :help="
-                        hasPasswordMismatch
-                            ? $t('passwordMismatchValidation')
-                            : ''
-                    "
+                    :help="hasPasswordMismatch ? $t('passwordMismatchValidation') : ''"
                 ></input-value>
-
                 <div class="text-center">
                     <button
                         class="btn btn-primary"
@@ -58,19 +49,17 @@
                 </div>
             </div>
         </form>
-        <div v-else class="alert alert-success mt-3" role="alert">
-            {{ $t("accountActivation") }}
-        </div>
+        <div v-else class="alert alert-success mt-3" role="alert">{{ $t("accountActivation") }}</div>
     </div>
 </template>
 
 
 <script>
 import { signUp } from "../api/apiCalls";
-import InputValue from "../components/input.vue";
+import InputValue from "../components/input";
 
 export default {
-    name: "SignUpPage",
+    name: "SignupPage",
     components: {
         InputValue,
     },
@@ -81,7 +70,7 @@ export default {
             password: "",
             passwordRepeat: "",
             apiProgress: false,
-            signUpSuccess: false,
+            signupSuccess: false,
             /** @type {SignUpError} */
             errors: {},
         };
@@ -98,12 +87,12 @@ export default {
 
             try {
                 await signUp(requestBody);
-                this.signUpSuccess = true;
+                this.signupSuccess = true;
             } catch (error) {
                 if (error.response.status === 400) {
                     this.errors = error.response.data.validationErrors;
                 }
-                this.signUpSuccess = false;
+                this.signupSuccess = false;
             } finally {
                 this.apiProgress = false;
             }

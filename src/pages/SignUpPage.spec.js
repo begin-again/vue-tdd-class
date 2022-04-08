@@ -1,7 +1,9 @@
 /**
 * @jest-environment jsdom
 */
-import SignUpPage from "./SignUpPage.vue";
+import SignupPage from "./SignupPage";
+import LanguageSelector from  "../components/language-selector";
+
 import {render, screen, waitFor} from "@testing-library/vue";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
@@ -10,7 +12,6 @@ import { rest } from "msw";
 import i18n from "../locales/i18n";
 import en from "../locales/en.json";
 import tr from "../locales/tr.json";
-import LanguageSelector from  "../components/language-selector.vue";
 // import 'whatwg-fetch'; use for when using browser's fetch api
 
 const GLOBAL_INTL = {
@@ -52,7 +53,7 @@ describe("Sign Up Page", () => {
 
     describe("layout", () => {
         const setup = () => {
-            render(SignUpPage, GLOBAL_INTL);
+            render(SignupPage, GLOBAL_INTL);
         };
 
         it("has sign up header", () => {
@@ -116,7 +117,7 @@ describe("Sign Up Page", () => {
             const config = {...defaults, ...options};
             const { name, email, pass1, pass2 } = config;
 
-            render(SignUpPage,  GLOBAL_INTL);
+            render(SignupPage,  GLOBAL_INTL);
             const userInput = screen.getByLabelText(en.username);
             const emailInput = screen.getByLabelText(en.email);
             const passwordInput = screen.getByLabelText(en.password);
@@ -307,11 +308,11 @@ describe("Sign Up Page", () => {
         const setup = () => {
             const app = {
                 components: {
-                    SignUpPage, LanguageSelector
+                    SignupPage, LanguageSelector
                 },
                 template: `
-                    <sign-up-page></sign-up-page>
-                    <language-selector></language-selector>
+                    <SignupPage />
+                    <LanguageSelector />
                 `
             };
             render(app, GLOBAL_INTL);
@@ -400,20 +401,26 @@ describe("Sign Up Page", () => {
             await screen.findByText(tr.accountActivation);
 
             expect(acceptLanguageHeader).toBe("tr");
+
+            await waitFor(() => {
+                expect(screen.queryByText(tr.accountActivation)).toBeInTheDocument();
+            });
         });
-        it("displays account activation messages after selecting that language", async () => {
+        fit("displays account activation messages after selecting that language", async () => {
             const {turkishLanguage, username, email, password, passwordRepeat, signUpButton} = setup();
 
-            await userEvent.click(turkishLanguage);
+
             await userEvent.type(username, defaults.name);
             await userEvent.type(email, defaults.email);
             await userEvent.type(password, defaults.pass1);
-            await userEvent.type(passwordRepeat, defaults.pass2);
+            await userEvent.type(passwordRepeat, defaults.pass1);
+
+            await userEvent.click(turkishLanguage);
             await userEvent.click(signUpButton);
 
-            const text = await screen.findByText(tr.accountActivation);
-
-            expect(text).toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.queryByText(tr.accountActivation)).toBeInTheDocument();
+            });
         });
     });
 });
