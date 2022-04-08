@@ -6,7 +6,7 @@
             data-test-id="form-sign-up"
         >
             <div class="card-header">
-                <h1 class="text-center">{{$t('signUp')}}</h1>
+                <h1 class="text-center">{{ $t("signUp") }}</h1>
             </div>
             <div class="card-body">
                 <input-value
@@ -35,7 +35,11 @@
                     :label="$t('passwordRepeat')"
                     type="password"
                     v-model="passwordRepeat"
-                    :help="hasPasswordMismatch ? 'Passwords mismatch' : ''"
+                    :help="
+                        hasPasswordMismatch
+                            ? $t('passwordMismatchValidation')
+                            : ''
+                    "
                 ></input-value>
 
                 <div class="text-center">
@@ -49,20 +53,20 @@
                             class="spinner-border spinner-border-sm"
                             role="status"
                         ></span>
-                        Sign Up
+                        {{ $t("signUp") }}
                     </button>
                 </div>
             </div>
         </form>
         <div v-else class="alert alert-success mt-3" role="alert">
-            Please check your e-mail to activate your account
+            {{ $t("accountActivation") }}
         </div>
     </div>
 </template>
 
 
 <script>
-import axios from "axios";
+import { signUp } from "../api/apiCalls";
 import InputValue from "../components/input.vue";
 
 export default {
@@ -78,31 +82,31 @@ export default {
             passwordRepeat: "",
             apiProgress: false,
             signUpSuccess: false,
+            /** @type {SignUpError} */
             errors: {},
         };
     },
     methods: {
-        submit() {
+        async submit() {
             const requestBody = {
                 username: this.username,
                 password: this.password,
                 email: this.email,
             };
+
             this.apiProgress = true;
-            axios
-                .post("/api/1.0/users", requestBody)
-                .then(() => {
-                    this.signUpSuccess = true;
-                })
-                .catch((error) => {
-                    if (error.response.status === 400) {
-                        this.errors = error.response.data.validationErrors;
-                    }
-                    this.signUpSuccess = false;
-                })
-                .finally(() => {
-                    this.apiProgress = false;
-                });
+
+            try {
+                await signUp(requestBody);
+                this.signUpSuccess = true;
+            } catch (error) {
+                if (error.response.status === 400) {
+                    this.errors = error.response.data.validationErrors;
+                }
+                this.signUpSuccess = false;
+            } finally {
+                this.apiProgress = false;
+            }
         },
     },
     computed: {
@@ -117,15 +121,14 @@ export default {
     },
     watch: {
         username(newValue) {
-            if(`${newValue}`.trim().length) delete this.errors.username;
+            if (`${newValue}`.trim().length) delete this.errors.username;
         },
         email(newValue) {
-            if(`${newValue}`.trim().length) delete this.errors.email;
+            if (`${newValue}`.trim().length) delete this.errors.email;
         },
         password(newValue) {
-            if(`${newValue}`.trim().length) delete this.errors.password;
+            if (`${newValue}`.trim().length) delete this.errors.password;
         },
-
     },
 };
 </script>

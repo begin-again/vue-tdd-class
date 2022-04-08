@@ -3,5 +3,8 @@
     "username": "KullaniciAdi",
     "email": "E-posta",
     "password": "Şifre",
-    "passwordRepeat": "Şifre Tekrar"
+    "passwordRepeat": "Şifre Tekrar",
+    "passwordMismatchValidation": "Şifre uyuşmazliği",
+    "usernameValidation": "Kullanici adi boş olamaz",
+    "accountActivation": "Hesabinizi etkinleştirmek için lütfen e-postanizi kontrol edin"
 }
