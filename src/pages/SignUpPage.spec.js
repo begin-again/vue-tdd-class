@@ -5,7 +5,7 @@ import SignupPage from "./SignupPage";
 import LanguageSelector from  "../components/language-selector";
 
 import {render, screen, waitFor} from "@testing-library/vue";
-import "@testing-library/jest-dom";
+
 import userEvent from "@testing-library/user-event";
 import { setupServer } from "msw/node";
 import { rest } from "msw";
@@ -306,7 +306,6 @@ describe("Sign Up Page", () => {
     });
     describe("Internationalizations", () => {
         const setup = () => {
-            i18n.global.locale = "en";
             const app = {
                 components: {
                     SignupPage, LanguageSelector
@@ -326,8 +325,6 @@ describe("Sign Up Page", () => {
             const signUpButton = screen.queryByRole("button", {name: en.signUp});
             return {turkishLanguage, englishLanguage, password, passwordRepeat, username, email, signUpButton};
         };
-
-
 
         it("displays all text in Turkish after selecting language", async () => {
             const {turkishLanguage} = setup();
