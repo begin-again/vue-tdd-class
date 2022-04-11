@@ -3,13 +3,23 @@ import App from "./App.vue";
 import i18n from "./locales/i18n";
 import userEvent from "@testing-library/user-event";
 import router from "./routes/router";
+import { setupServer } from "msw/node";
+import { rest } from "msw";
 
+
+const server = setupServer(
+    rest.post("/api/1.0/users/token/:token", (_req, res, ctx) => {
+        return res(ctx.status(200));
+    })
+);
+beforeAll(() => server.listen());
+beforeEach(() => server.restoreHandlers());
+afterAll(() => server.close());
 
 const GLOBAL_INTL = {
     global: {
         plugins: [i18n, router]
     }
-
 };
 
 const setup = async (path) => {
@@ -26,6 +36,8 @@ fdescribe("Routing", () => {
         ${"/login"} | ${"login-page"}
         ${"/user/1"} | ${"user-page"}
         ${"/user/2"} | ${"user-page"}
+        ${"/activate/1234"} | ${"activation-page"}
+        ${"/activate/5678"} | ${"activation-page"}
     `("displays $pageTestId when path is $path", async ({path, pageTestId}) => {
         await setup(path);
         const page = screen.queryByTestId(pageTestId);
@@ -37,15 +49,23 @@ fdescribe("Routing", () => {
         ${"/"} | ${"signup-page"}
         ${"/"} | ${"login-page"}
         ${"/"} | ${"user-page"}
+        ${"/"} | ${"activation-page"}
         ${"/signup"} | ${"home-page"}
         ${"/signup"} | ${"login-page"}
         ${"/signup"} | ${"user-page"}
+        ${"/signup"} | ${"activation-page"}
         ${"/login"} | ${"home-page"}
         ${"/login"} | ${"signup-page"}
         ${"/login"} | ${"user-page"}
+        ${"/login"} | ${"activation-page"}
         ${"/user/1"} | ${"home-page"}
         ${"/user/1"} | ${"login-page"}
         ${"/user/1"} | ${"signup-page"}
+        ${"/user/1"} | ${"activation-page"}
+        ${"/activate/123"} | ${"signup-page"}
+        ${"/activate/123"} | ${"user-page"}
+        ${"/activate/123"} | ${"login-page"}
+        ${"/activate/123"} | ${"home-page"}
     `("does not display $pageTestId when path is $path", async ({path, pageTestId}) => {
         await setup(path);
         const page = screen.queryByTestId(pageTestId);

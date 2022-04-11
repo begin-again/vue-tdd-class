@@ -9,3 +9,11 @@ export const signUp = (requestBody) => {
         });
 
 };
+
+
+export const activate = (token) => {
+    return axios
+        .post(`/api/1.0/users/token/${token}`, {
+            headers: {"Accept-Language": i18n.global.locale}
+        });
+};
