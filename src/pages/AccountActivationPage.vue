@@ -2,13 +2,18 @@
     <div data-testid="activation-page">
         <div v-if="success" class="alert alert-success mt-3">Account is activated</div>
         <div v-if="fail" class="alert alert-danger mt-3">Activation failure</div>
-        <span v-if="apiProgress" class="spinner-border" role="status"></span>
+        <SpinnerIcon v-if="apiProgress" size="normal" />
     </div>
 </template>
 
 <script>
 import { activate } from "../api/apiCalls";
+import SpinnerIcon from "../components/SpinnerIcon";
+
 export default {
+    components: {
+        SpinnerIcon,
+    },
     data() {
         return {
             apiProgress: true,

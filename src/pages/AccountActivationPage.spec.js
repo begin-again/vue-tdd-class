@@ -9,7 +9,7 @@ beforeAll(() => server.listen());
 beforeEach(() => server.restoreHandlers());
 afterAll(() => server.close());
 
-fdescribe("Account Activation Page",() => {
+describe("Account Activation Page",() => {
     const setup = (token) => {
         render(AccountActivationPage, {
             global: {

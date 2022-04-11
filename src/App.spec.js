@@ -28,7 +28,7 @@ const setup = async (path) => {
     await router.isReady();
 };
 
-fdescribe("Routing", () => {
+describe("Routing", () => {
     it.each`
         path | pageTestId
         ${"/"} | ${"home-page"}
