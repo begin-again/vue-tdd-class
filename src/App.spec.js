@@ -2,16 +2,20 @@ import {render, screen} from "@testing-library/vue";
 import App from "./App.vue";
 import i18n from "./locales/i18n";
 import userEvent from "@testing-library/user-event";
+import router from "./routes/router";
+
 
 const GLOBAL_INTL = {
     global: {
-        plugins: [i18n]
+        plugins: [i18n, router]
     }
+
 };
 
-const setup = (path) => {
-    window.history.pushState({}, "", path);
+const setup = async (path) => {
     render(App, GLOBAL_INTL);
+    router.replace(path);
+    await router.isReady();
 };
 
 fdescribe("Routing", () => {
@@ -22,8 +26,8 @@ fdescribe("Routing", () => {
         ${"/login"} | ${"login-page"}
         ${"/user/1"} | ${"user-page"}
         ${"/user/2"} | ${"user-page"}
-    `("displays $pageTestId when path is $path", ({path, pageTestId}) => {
-        setup(path);
+    `("displays $pageTestId when path is $path", async ({path, pageTestId}) => {
+        await setup(path);
         const page = screen.queryByTestId(pageTestId);
 
         expect(page).toBeInTheDocument();
@@ -42,8 +46,8 @@ fdescribe("Routing", () => {
         ${"/user/1"} | ${"home-page"}
         ${"/user/1"} | ${"login-page"}
         ${"/user/1"} | ${"signup-page"}
-    `("does not display $pageTestId when path is $path", ({path, pageTestId}) => {
-        setup(path);
+    `("does not display $pageTestId when path is $path", async ({path, pageTestId}) => {
+        await setup(path);
         const page = screen.queryByTestId(pageTestId);
 
         expect(page).not.toBeInTheDocument();
@@ -53,9 +57,9 @@ fdescribe("Routing", () => {
         ${"Home"}
         ${"Sign Up"}
         ${"Login"}
-    `("has link to '$targetPage' from NavBar", ({targetPage}) => {
-        setup("/");
-        const link = screen.queryByRole("link", {name: targetPage });
+    `("has link to '$targetPage' from NavBar", async ({targetPage}) => {
+        await setup("/");
+        const link = await screen.findByRole("link", {name: targetPage });
 
         expect(link).toBeInTheDocument();
     });
@@ -63,22 +67,22 @@ fdescribe("Routing", () => {
         initialPath | clickingTo | visiblePage
         ${"/"} | ${"Sign Up"} | ${"signup-page"}
         ${"/signup"} | ${"Home"} | ${"home-page"}
-        ${"/login"} | ${"Login"} | ${"login-page"}
+        ${"/"} | ${"Login"} | ${"login-page"}
     `("displays $initialPath page after clicking signup link", async ({initialPath, clickingTo, visiblePage}) => {
-        setup(initialPath);
+        await setup(initialPath);
         const link = screen.queryByRole("link", {name: clickingTo });
-        await userEvent.click(link);
 
-        const page = screen.queryByTestId(visiblePage);
+        await userEvent.click(link);
+        const page = await screen.findByTestId(visiblePage);
 
         expect(page).toBeInTheDocument();
     });
     it("displays home page when clicking brand logo", async () => {
-        setup("/login");
+        await setup("/login");
         const img =  screen.queryByAltText("hoaxify logo");
 
         await userEvent.click(img);
-        const page = screen.queryByTestId("home-page");
+        const page = await screen.findByTestId("home-page");
 
         expect(page).toBeInTheDocument();
     });
