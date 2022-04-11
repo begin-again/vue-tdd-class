@@ -29,6 +29,6 @@ img {
 
 <script>
 export default {
-    name: "language-selector",
+    name: "LanguageSelector",
 };
 </script>

@@ -2,7 +2,7 @@
 * @jest-environment jsdom
 */
 import SignupPage from "./SignupPage";
-import LanguageSelector from  "../components/language-selector";
+import LanguageSelector from  "../components/LanguageSelector";
 
 import {render, screen, waitFor} from "@testing-library/vue";
 

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import LanguageSelector from "./components/language-selector";
+import LanguageSelector from "./components/LanguageSelector";
 
 export default {
     name: "App",
