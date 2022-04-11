@@ -15,7 +15,7 @@ xdescribe("Routing", () => {
         const page = screen.queryByTestId("home-page");
         expect(page).toBeInTheDocument();
     });
-    it("does not display SIgnUpPage when at root url", () => {
+    it("does not display SignUpPage when at root url", () => {
         render(App, GLOBAL_INTL);
         const page = screen.queryByTestId("signup-page");
         expect(page).not.toBeInTheDocument();
